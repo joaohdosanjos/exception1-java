@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import model.Exception.DomainException;
+
 public class Reserva {
 	private Integer roomNumber;
 	private Date checkIn;
@@ -11,8 +13,10 @@ public class Reserva {
 
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
 	
-	public Reserva(Integer roomNumber, Date checkIn, Date checkOut) {
-		super();
+	public Reserva(Integer roomNumber, Date checkIn, Date checkOut) throws DomainException {
+		if (!checkOut.after(checkIn)) {
+			throw new DomainException("A data de Check-Out deve ser depois do check-in");
+		}
 		this.roomNumber = roomNumber;
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
@@ -39,17 +43,16 @@ public class Reserva {
 		return TimeUnit.DAYS.convert(diferenca, TimeUnit.MILLISECONDS);	
 	}
 	
-	public String updateDates(Date checkIn, Date checkOut) {
+	public void updateDates(Date checkIn, Date checkOut) throws DomainException {
 		Date now = new Date();
 		if (checkIn.before(now) || checkOut.before(now)) {
-			return "As reservas devem ser feitas depois das datas feitas";
+			throw new DomainException("As reservas devem ser feitas depois das datas feitas") ;
 		}
 		if (!checkOut.after(checkIn)) {
-			return "A data de Check-Out deve ser depois do check-in";
+			throw new DomainException("A data de Check-Out deve ser depois do check-in");
 		}
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
-		return null;
 	}
 	
 	@Override
